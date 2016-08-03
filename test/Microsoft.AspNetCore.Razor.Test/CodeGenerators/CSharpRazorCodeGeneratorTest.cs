@@ -404,6 +404,11 @@ namespace Microsoft.AspNetCore.Razor.CodeGenerators
             });
         }
 
+        [Fact]
+        public void CSharpChunkGeneratorCorrectlyGeneratesDesignTimePragmasForExplicitExpressionContainingMarkup()
+        {
+            RunTest("ExplicitExpressionWithMarkup", designTimeMode: true, expectedDesignTimePragmas: new List<LineMapping>());
+        }
 
         [Fact]
         public void CSharpChunkGeneratorCorrectlyGeneratesDesignTimePragmasForImplicitExpressionStartedAtEOF()

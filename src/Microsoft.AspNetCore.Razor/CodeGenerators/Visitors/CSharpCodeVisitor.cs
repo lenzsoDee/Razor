@@ -399,29 +399,38 @@ namespace Microsoft.AspNetCore.Razor.CodeGenerators.Visitors
 
         public void RenderDesignTimeExpressionBlockChunk(ExpressionBlockChunk chunk)
         {
-            var firstChild = (ExpressionChunk)chunk.Children.FirstOrDefault();
-
+            var firstChild = chunk.Children.FirstOrDefault();
             if (firstChild != null)
             {
                 var currentIndent = Writer.CurrentIndent;
-                var designTimeAssignment = "__o = ";
                 Writer.ResetIndent();
 
                 var documentLocation = firstChild.Association.Start;
+
                 // This is only here to enable accurate formatting by the C# editor.
                 Writer.WriteLineNumberDirective(documentLocation, Context.SourceFile);
 
-                // We build the padding with an offset of the design time assignment statement.
-                Writer.Write(_paddingBuilder.BuildExpressionPadding((Span)firstChild.Association, designTimeAssignment.Length))
-                      .Write(designTimeAssignment);
+                var designTimeAssignment = "__o = ";
+                var firstChildExpressionChunk = firstChild as ExpressionChunk;
+                if (firstChildExpressionChunk != null)
+                {
+                    // We build the padding with an offset of the design time assignment statement.
+                    Writer.Write(_paddingBuilder.BuildExpressionPadding((Span)firstChildExpressionChunk.Association, designTimeAssignment.Length))
+                          .Write(designTimeAssignment);
 
-                // We map the first line of code but do not write the line pragmas associated with it.
-                CreateRawCodeMapping(firstChild.Code, documentLocation);
+                    // We map the first line of code but do not write the line pragmas associated with it.
+                    CreateRawCodeMapping(firstChildExpressionChunk.Code, documentLocation);
 
-                // Render all but the first child.
-                // The reason why we render the other children differently is because when formatting the C# code
-                // the formatter expects the start line to have the assignment statement on it.
-                Accept(chunk.Children.Skip(1).ToList());
+                    // Render all but the first child.
+                    // The reason why we render the other children differently is because when formatting the C# code
+                    // the formatter expects the start line to have the assignment statement on it.
+                    Accept(chunk.Children.Skip(1).ToList());
+                }
+                else
+                {
+                    // First child is not an expression block
+                    Accept(chunk.Children.ToList());
+                }
 
                 Writer.WriteLine(";")
                       .WriteLine()
