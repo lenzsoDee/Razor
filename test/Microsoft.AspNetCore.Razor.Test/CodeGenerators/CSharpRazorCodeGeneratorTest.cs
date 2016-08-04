@@ -72,6 +72,7 @@ namespace Microsoft.AspNetCore.Razor.CodeGenerators
         [InlineData("ConditionalAttributes")]
         [InlineData("Await")]
         [InlineData("CodeBlockWithTextElement")]
+        [InlineData("ExplicitExpressionWithMarkup")]
         public void CSharpChunkGeneratorCorrectlyGeneratesRunTimeCode(string testType)
         {
             RunTest(testType);
@@ -407,7 +408,11 @@ namespace Microsoft.AspNetCore.Razor.CodeGenerators
         [Fact]
         public void CSharpChunkGeneratorCorrectlyGeneratesDesignTimePragmasForExplicitExpressionContainingMarkup()
         {
-            RunTest("ExplicitExpressionWithMarkup", designTimeMode: true, expectedDesignTimePragmas: new List<LineMapping>());
+            RunTest(
+                "ExplicitExpressionWithMarkup",
+                "ExplicitExpressionWithMarkup.DesignTime",
+                designTimeMode: true,
+                expectedDesignTimePragmas: new List<LineMapping>());
         }
 
         [Fact]
